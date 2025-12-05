@@ -1,4 +1,6 @@
-# 🎮 Nusantara Food Catcher
+# 🎮 MBG RHYTHM
+
+
 
 Game arcade Python + Pygame bertema Nusantara dengan mekanik menangkap makanan yang jatuh.
 
