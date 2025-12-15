@@ -8,7 +8,7 @@ from screens.base import BaseScreen
 from ui.button import Button
 from core.background import Background
 from core.audio_manager import AudioManager
-
+from utils.load_image import get_assets_path, load_image_fit
 
 class HighScore(BaseScreen):
     """
@@ -20,14 +20,13 @@ class HighScore(BaseScreen):
     def __init__(self, screen_width, screen_height, game_results=None):
         super().__init__(screen_width, screen_height)
         
-        # Composition
-        self._background = Background(screen_width, screen_height)
+        self._background = self._load_background('home.png')
         
         # Get audio manager
         self._audio = AudioManager()
         
         # Create button with audio
-        self._back_button = Button(screen_width // 2, screen_height - 80, 200, 60, "MENU", audio_manager=self._audio)
+        self._back_button = Button(100, screen_height - 80, 150, 100, "Back", audio_manager=self._audio, image_name='button-back.png')
         
         # Play victory sound
         self._audio.play_sound('victory')
@@ -88,7 +87,7 @@ class HighScore(BaseScreen):
     def draw(self, screen):
         """Draw high score screen"""
         # Draw background
-        self._background.draw(screen)
+        screen.blit(self._background, (0, 0))
         
         # Draw title
         title_font = pygame.font.Font(None, 72)
@@ -189,7 +188,7 @@ class HighScore(BaseScreen):
         
         for i, stat in enumerate(stats):
             # Alternating colors for readability
-            color = (255, 255, 255) if i % 2 == 0 else (220, 220, 220)
+            color = (255, 255, 255)
             stat_text = stats_font.render(stat, True, color)
             stat_rect = stat_text.get_rect(center=(self._width // 2, y_start + i * line_height))
             screen.blit(stat_text, stat_rect)

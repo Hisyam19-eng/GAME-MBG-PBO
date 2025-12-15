@@ -89,8 +89,8 @@ class Game:
             self._game_over_reason = "HP habis!"
             return
         
-        # Update player
-        self._player.update()
+        # Update player with delta time
+        self._player.update(delta_time)
         
         # Spawn items
         self._spawn_timer += delta_time * 1000
@@ -148,6 +148,10 @@ class Game:
             # Cap HP at max
             if self._hp > self._max_hp:
                 self._hp = self._max_hp
+            
+            # Trigger bad state on player if caught bad item
+            if effect['hp'] < 0:
+                self._player.trigger_bad_state()
             
             # Update statistics
             self._total_caught += 1
