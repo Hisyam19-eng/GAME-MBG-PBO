@@ -5,6 +5,7 @@ Demonstrates: Inheritance, Polymorphism, Encapsulation, Exception Handling
 import pygame
 import random
 from abc import ABC, abstractmethod
+from utils.load_image import get_assets_path, load_image_fit
 
 
 class BaseItem(ABC):
@@ -101,29 +102,50 @@ class GoodItem(BaseItem):
     Polymorphism: Implements abstract methods with specific behavior
     """
     
-    # Class variable for item names (Indonesian foods)
-    FOOD_NAMES = [
-        "Nasi Goreng", "Rendang", "Sate", "Gado-Gado",
-        "Bakso", "Soto", "Nasi Uduk", "Martabak"
-    ]
+    # Class variable for available food types
+    FOOD_TYPES = ['banana', 'carrot', 'chicken', 'fish', 'milk', 'rice', 'vegetable']
     
     def __init__(self, x, y):
-        super().__init__(x, y, radius=22)
-        self._name = random.choice(self.FOOD_NAMES)
-        self._color = (34, 197, 94)  # Green
+        super().__init__(x, y, radius=30)
+        self._food_type = random.choice(self.FOOD_TYPES)
+        self._name = self._food_type.capitalize()
+        self._color = (34, 197, 94)  # Green (fallback)
         self._outline_color = (22, 163, 74)
+        
+        # Load food image
+        self._load_image()
+    
+    def _load_image(self):
+        """Load food sprite image"""
+        try:
+            image_path = get_assets_path('images', 'foods', f'{self._food_type}.png')
+            image, width, height = load_image_fit(
+                image_path, 
+                self._radius * 2, 
+                self._radius * 2, 
+                convert_alpha=True
+            )
+            self._image = image
+            self._image_width = width
+            self._image_height = height
+        except Exception as e:
+            print(f"Error loading good food image '{self._food_type}.png': {e}")
+            self._image = None
     
     def draw(self, screen):
-        """Draw good item as green circle (polymorphic implementation)"""
-        # Outer glow
-        pygame.draw.circle(screen, self._outline_color, 
-                         (int(self._x), int(self._y)), self._radius + 2)
-        # Main circle
-        pygame.draw.circle(screen, self._color, 
-                         (int(self._x), int(self._y)), self._radius)
-        # Highlight
-        pygame.draw.circle(screen, (187, 247, 208), 
-                         (int(self._x - 5), int(self._y - 5)), 6)
+        """Draw good item using sprite image (polymorphic implementation)"""
+        if self._image:
+            # Draw sprite image
+            image_rect = self._image.get_rect(center=(int(self._x), int(self._y)))
+            screen.blit(self._image, image_rect)
+        else:
+            # Fallback to colored circle if image not loaded
+            pygame.draw.circle(screen, self._outline_color, 
+                             (int(self._x), int(self._y)), self._radius + 2)
+            pygame.draw.circle(screen, self._color, 
+                             (int(self._x), int(self._y)), self._radius)
+            pygame.draw.circle(screen, (187, 247, 208), 
+                             (int(self._x - 5), int(self._y - 5)), 6)
     
     def get_effect(self):
         """Good item adds 5 score (polymorphic implementation)"""
@@ -141,26 +163,53 @@ class BadItem(BaseItem):
     Polymorphism: Implements abstract methods differently than GoodItem
     """
     
+    # Class variable for available bad food types
+    FOOD_TYPES = ['banana', 'carrot', 'chicken', 'fish', 'milk', 'rice', 'vegetable']
+    
     def __init__(self, x, y):
-        super().__init__(x, y, radius=20)
-        self._color = (239, 68, 68)  # Red
+        super().__init__(x, y, radius=30)
+        self._food_type = random.choice(self.FOOD_TYPES)
+        self._color = (239, 68, 68)  # Red (fallback)
         self._outline_color = (220, 38, 38)
+        
+        # Load bad food image
+        self._load_image()
+    
+    def _load_image(self):
+        """Load bad food sprite image"""
+        try:
+            image_path = get_assets_path('images', 'foods', f'{self._food_type}-bad.png')
+            image, width, height = load_image_fit(
+                image_path, 
+                self._radius * 2, 
+                self._radius * 2, 
+                convert_alpha=True
+            )
+            self._image = image
+            self._image_width = width
+            self._image_height = height
+        except Exception as e:
+            print(f"Error loading bad food image '{self._food_type}-bad.png': {e}")
+            self._image = None
     
     def draw(self, screen):
-        """Draw bad item as red circle with X mark (polymorphic implementation)"""
-        # Outer glow
-        pygame.draw.circle(screen, self._outline_color, 
-                         (int(self._x), int(self._y)), self._radius + 2)
-        # Main circle
-        pygame.draw.circle(screen, self._color, 
-                         (int(self._x), int(self._y)), self._radius)
-        # X mark
-        pygame.draw.line(screen, (255, 255, 255),
-                        (self._x - 8, self._y - 8),
-                        (self._x + 8, self._y + 8), 3)
-        pygame.draw.line(screen, (255, 255, 255),
-                        (self._x + 8, self._y - 8),
-                        (self._x - 8, self._y + 8), 3)
+        """Draw bad item using sprite image (polymorphic implementation)"""
+        if self._image:
+            # Draw sprite image
+            image_rect = self._image.get_rect(center=(int(self._x), int(self._y)))
+            screen.blit(self._image, image_rect)
+        else:
+            # Fallback to colored circle with X mark if image not loaded
+            pygame.draw.circle(screen, self._outline_color, 
+                             (int(self._x), int(self._y)), self._radius + 2)
+            pygame.draw.circle(screen, self._color, 
+                             (int(self._x), int(self._y)), self._radius)
+            pygame.draw.line(screen, (255, 255, 255),
+                            (self._x - 8, self._y - 8),
+                            (self._x + 8, self._y + 8), 3)
+            pygame.draw.line(screen, (255, 255, 255),
+                            (self._x + 8, self._y - 8),
+                            (self._x - 8, self._y + 8), 3)
     
     def get_effect(self):
         """Bad item reduces 1 HP (polymorphic implementation)"""
