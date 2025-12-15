@@ -287,7 +287,7 @@ class GameScreen(BaseScreen):
         """Draw game over overlay"""
         # Semi-transparent overlay
         overlay = pygame.Surface((self._width, self._height))
-        overlay.set_alpha(200)
+        overlay.set_alpha(100)
         overlay.fill((0, 0, 0))
         screen.blit(overlay, (0, 0))
         
