@@ -112,6 +112,10 @@ class GameScreen(BaseScreen):
         self._last_score = 0
         self._last_hp = 3
         self._game_over_sound_played = False
+        
+        # Game over background
+        self._game_over_background = None
+        self._game_over_background_loaded = False
     
     def handle_event(self, event):
         """Handle game events"""
@@ -127,6 +131,9 @@ class GameScreen(BaseScreen):
                 self._floating_texts.clear()
                 self._last_score = 0
                 self._last_hp = 3
+                self._game_over_sound_played = False
+                self._game_over_background = None
+                self._game_over_background_loaded = False
     
     def update(self):
         """Update game screen"""
@@ -158,6 +165,11 @@ class GameScreen(BaseScreen):
                 self._audio.stop_music()
                 self._audio.play_sound('game_over')
                 self._game_over_sound_played = True
+            
+            # Load appropriate game over background
+            if not self._game_over_background_loaded:
+                self._load_game_over_background()
+                self._game_over_background_loaded = True
     
     def _check_for_catches(self):
         """Check if item was caught and create effects"""
@@ -213,10 +225,48 @@ class GameScreen(BaseScreen):
         except Exception as e:
             print(f"Error creating catch effect: {e}")
     
+    def _get_stars_from_score(self, score):
+        """
+        Calculate number of stars based on score
+        
+        Args:
+            score: Player's final score
+            
+        Returns:
+            int: Number of stars (1-3)
+        """
+        if score >= 100:
+            return 3
+        elif score >= 50:
+            return 2
+        else:
+            return 1
+    
+    def _load_game_over_background(self):
+        """Load appropriate game over background based on score"""
+        results = self._game.get_results()
+        score = results['score']
+        
+        # Get number of stars
+        stars = self._get_stars_from_score(score)
+        
+        # Load win.png if 2+ stars, else lose.png
+        if stars >= 2:
+            background_name = 'win.png'
+        else:
+            background_name = 'lose.png'
+        
+        self._game_over_background = self._load_background(background_name)
+    
     def draw(self, screen):
         """Draw game screen"""
-        # Draw background image
-        screen.blit(self._background, (0, 0))
+        # Draw appropriate background
+        if self._game.is_game_over and self._game_over_background:
+            # Draw game over background (win or lose)
+            screen.blit(self._game_over_background, (0, 0))
+        else:
+            # Draw normal game background
+            screen.blit(self._background, (0, 0))
         
         # Draw game (without its own background)
         self._game.draw(screen, draw_background=False)
@@ -283,13 +333,8 @@ class GameScreen(BaseScreen):
     
     def _draw_stars(self, screen, score):
         """Draw star rating based on score"""
-        # Determine number of stars (1-3)
-        if score >= 100:
-            stars = 3
-        elif score >= 50:
-            stars = 2
-        else:
-            stars = 1
+        # Get number of stars using shared logic
+        stars = self._get_stars_from_score(score)
         
         # Draw stars
         star_y = self._height // 2 - 30

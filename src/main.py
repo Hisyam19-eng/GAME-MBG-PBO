@@ -28,7 +28,7 @@ class GameManager:
             sys.exit(1)
         
         # Screen settings
-        self._width = 800
+        self._width = 1000
         self._height = 600
         self._screen = pygame.display.set_mode((self._width, self._height))
         pygame.display.set_caption("Cooking Rhythm MBG")
