@@ -3,6 +3,7 @@ Modern button UI component with hover effects
 Demonstrates: Encapsulation
 """
 import pygame
+from utils.load_image import load_ui_image
 
 
 class Button:
@@ -11,7 +12,7 @@ class Button:
     Encapsulation: Internal state management for hover/click
     """
     
-    def __init__(self, x, y, width, height, text, font_size=32, audio_manager=None):
+    def __init__(self, x, y, width, height, text, font_size=32, audio_manager=None, image_name=None):
         """
         Initialize button
         
@@ -23,6 +24,7 @@ class Button:
             text: Button text
             font_size: Font size for text
             audio_manager: Optional AudioManager for click sounds
+            image_name: Optional image filename from assets/images/ui/
         """
         self._x = x
         self._y = y
@@ -31,6 +33,12 @@ class Button:
         self._text = text
         self._font = pygame.font.Font(None, font_size)
         self._audio_manager = audio_manager
+        
+        # Load image if provided
+        self._image = None
+        self._image_hover = None
+        if image_name:
+            self._load_image(image_name)
         
         # State
         self._is_hovered = False
@@ -45,6 +53,28 @@ class Button:
         # Animation
         self._scale = 1.0
         self._target_scale = 1.0
+    
+    def _load_image(self, image_name):
+        """Load button image from assets/images/ui/ using utility function"""
+        try:
+            # Load image with proper scaling using utility function
+            self._image, self._img_width, self._img_height = load_ui_image(
+                image_name, 
+                self._width, 
+                self._height
+            )
+            
+            # Create hover version (slightly brighter)
+            self._image_hover = self._image.copy()
+            brightness = pygame.Surface(self._image_hover.get_size(), pygame.SRCALPHA)
+            brightness.fill((30, 30, 30, 0))
+            self._image_hover.blit(brightness, (0, 0), special_flags=pygame.BLEND_RGB_ADD)
+        except Exception as e:
+            print(f"Error loading button image '{image_name}': {e}")
+            self._image = None
+            self._image_hover = None
+            self._img_width = self._width
+            self._img_height = self._height
     
     def update(self, mouse_pos, mouse_pressed):
         """
@@ -71,40 +101,58 @@ class Button:
     
     def draw(self, screen):
         """Draw the button with current state"""
-        # Determine color based on state
-        if self._is_pressed:
-            color = self._pressed_color
-        elif self._is_hovered:
-            color = self._hover_color
-        else:
-            color = self._normal_color
-        
         # Calculate scaled dimensions
         scaled_width = int(self._width * self._scale)
         scaled_height = int(self._height * self._scale)
         
-        # Draw shadow
-        shadow_rect = pygame.Rect(
-            self._x - scaled_width // 2 + 4,
-            self._y - scaled_height // 2 + 4,
-            scaled_width,
-            scaled_height
-        )
-        pygame.draw.rect(screen, (0, 0, 0, 80), shadow_rect, border_radius=12)
-        
-        # Draw button
-        button_rect = pygame.Rect(
-            self._x - scaled_width // 2,
-            self._y - scaled_height // 2,
-            scaled_width,
-            scaled_height
-        )
-        pygame.draw.rect(screen, color, button_rect, border_radius=10)
-        
-        # Draw text
-        text_surface = self._font.render(self._text, True, self._text_color)
-        text_rect = text_surface.get_rect(center=(self._x, self._y))
-        screen.blit(text_surface, text_rect)
+        # If image exists, draw image button
+        if self._image:
+            # Select image based on state
+            if self._is_hovered or self._is_pressed:
+                current_image = self._image_hover
+            else:
+                current_image = self._image
+            
+            # Scale image maintaining aspect ratio
+            img_scaled_width = int(self._img_width * self._scale)
+            img_scaled_height = int(self._img_height * self._scale)
+            scaled_image = pygame.transform.smoothscale(current_image, (img_scaled_width, img_scaled_height))
+            
+            # Draw image (no shadow to preserve transparency)
+            image_rect = scaled_image.get_rect(center=(self._x, self._y))
+            screen.blit(scaled_image, image_rect)
+        else:
+            # Fallback to colored button
+            # Determine color based on state
+            if self._is_pressed:
+                color = self._pressed_color
+            elif self._is_hovered:
+                color = self._hover_color
+            else:
+                color = self._normal_color
+            
+            # Draw shadow
+            shadow_rect = pygame.Rect(
+                self._x - scaled_width // 2 + 4,
+                self._y - scaled_height // 2 + 4,
+                scaled_width,
+                scaled_height
+            )
+            pygame.draw.rect(screen, (0, 0, 0, 80), shadow_rect, border_radius=12)
+            
+            # Draw button
+            button_rect = pygame.Rect(
+                self._x - scaled_width // 2,
+                self._y - scaled_height // 2,
+                scaled_width,
+                scaled_height
+            )
+            pygame.draw.rect(screen, color, button_rect, border_radius=10)
+            
+            # Draw text
+            text_surface = self._font.render(self._text, True, self._text_color)
+            text_rect = text_surface.get_rect(center=(self._x, self._y))
+            screen.blit(text_surface, text_rect)
     
     def is_clicked(self, mouse_pos, mouse_clicked):
         """

@@ -90,6 +90,9 @@ class GameScreen(BaseScreen):
     def __init__(self, screen_width, screen_height):
         super().__init__(screen_width, screen_height)
         
+        # Load background image
+        self._background = self._load_background('play.png')
+        
         # Composition: GameScreen contains Game
         self._game = Game(screen_width, screen_height)
         
@@ -212,8 +215,11 @@ class GameScreen(BaseScreen):
     
     def draw(self, screen):
         """Draw game screen"""
-        # Draw game
-        self._game.draw(screen)
+        # Draw background image
+        screen.blit(self._background, (0, 0))
+        
+        # Draw game (without its own background)
+        self._game.draw(screen, draw_background=False)
         
         # Draw particles
         for particle in self._particles:

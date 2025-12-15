@@ -158,9 +158,16 @@ class Game:
         except Exception as e:
             print(f"Error catching item: {e}")
     
-    def draw(self, screen):
-        """Draw game elements"""
-        self._background.draw(screen)
+    def draw(self, screen, draw_background=True):
+        """
+        Draw game elements
+        
+        Args:
+            screen: pygame surface to draw on
+            draw_background: Whether to draw the background (default True)
+        """
+        if draw_background:
+            self._background.draw(screen)
         
         # Draw items
         for item in self._items:
