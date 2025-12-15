@@ -20,7 +20,7 @@ class HighScore(BaseScreen):
     def __init__(self, screen_width, screen_height, game_results=None):
         super().__init__(screen_width, screen_height)
         
-        self._background = self._load_background('home.png')
+        self._background = self._load_background('score.png')
         
         # Get audio manager
         self._audio = AudioManager()
@@ -128,12 +128,6 @@ class HighScore(BaseScreen):
             size = int(30 * scale)
             if size > 0:
                 self._draw_star(screen, star_x, star_y, size, color)
-                
-                # Add glow effect for active stars
-                if i < self._target_stars and scale > 0.5:
-                    glow_size = int(size * 1.5)
-                    glow_alpha = int(100 * scale)
-                    self._draw_star_glow(screen, star_x, star_y, glow_size, color, glow_alpha)
     
     def _draw_star(self, screen, x, y, size, color):
         """Draw a star shape"""
