@@ -4,6 +4,7 @@ Demonstrates: Inheritance (abstract base class), Exception Handling
 """
 from abc import ABC, abstractmethod
 import pygame
+from utils.load_image import load_background_image
 
 
 class BaseScreen(ABC):
@@ -110,3 +111,16 @@ class BaseScreen(ABC):
     @property
     def height(self):
         return self._height
+    
+    def _load_background(self, image_name, fallback_color=(50, 50, 100)):
+        """
+        Load and scale background image using utility function
+        
+        Args:
+            image_name: Name of the image file in assets/images/backgrounds/
+            fallback_color: RGB tuple for fallback color if image fails to load
+        
+        Returns:
+            pygame.Surface: The loaded and scaled background surface
+        """
+        return load_background_image(image_name, self._width, self._height, fallback_color)

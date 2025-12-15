@@ -1,5 +1,5 @@
 """
-Main entry point for Nusantara Food Catcher game
+Main entry point for Cooking Rhythm MBG game
 Demonstrates: Composition (contains screens), Exception Handling
 """
 import pygame
@@ -31,7 +31,7 @@ class GameManager:
         self._width = 800
         self._height = 600
         self._screen = pygame.display.set_mode((self._width, self._height))
-        pygame.display.set_caption("Nusantara Food Catcher")
+        pygame.display.set_caption("Cooking Rhythm MBG")
         
         # Clock for FPS management
         self._clock = pygame.time.Clock()
@@ -56,6 +56,7 @@ class GameManager:
         try:
             self._screens['MAIN_MENU'] = MainMenu(self._width, self._height)
             self._screens['GAME'] = GameScreen(self._width, self._height)
+            self._screens['HIGH_SCORE'] = HighScore(self._width, self._height)
             # High score screen will be created dynamically with results
             
             self._current_screen = self._screens['MAIN_MENU']
