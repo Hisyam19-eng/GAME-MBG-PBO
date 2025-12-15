@@ -154,7 +154,7 @@ pip install pygame numpy
 
 ### Jalankan Game
 ```bash
-cd "d:/BELAJAR_PYTHON/GAME CAK"
+cd "GAME-MBG-PBO"
 python src/main.py
 ```
 
