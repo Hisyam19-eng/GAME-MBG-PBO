@@ -55,9 +55,7 @@ class GameManager:
         """Initialize all game screens"""
         try:
             self._screens['MAIN_MENU'] = MainMenu(self._width, self._height)
-            self._screens['GAME'] = GameScreen(self._width, self._height)
-            self._screens['HIGH_SCORE'] = HighScore(self._width, self._height)
-            # High score screen will be created dynamically with results
+            # Game and HighScore screens will be created on demand when switching
             
             self._current_screen = self._screens['MAIN_MENU']
         except Exception as e:
