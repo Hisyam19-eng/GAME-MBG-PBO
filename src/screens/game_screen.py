@@ -134,6 +134,9 @@ class GameScreen(BaseScreen):
                 self._game_over_sound_played = False
                 self._game_over_background = None
                 self._game_over_background_loaded = False
+                
+                # Restart music
+                self._audio.play_music('game_music', loop=True)
     
     def update(self):
         """Update game screen"""
